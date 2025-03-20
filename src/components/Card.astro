@@ -1,0 +1,10 @@
+---
+const { cardImg } = Astro.props;
+const { cardTitle } = Astro.props;
+---
+
+<div class="card">
+  <div class="cardGradient"></div>
+  <img src={cardImg} alt="" />
+  <div class="cardTitle">{cardTitle}</div>
+</div>

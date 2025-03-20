@@ -1,0 +1,81 @@
+---
+import { db, Forces, Battlelog } from 'astro:db';
+import ContentLayout from '../layouts/contentLayout.astro';
+
+const forces = await db.select().from(Forces);
+const battlelog = await db.select().from(Battlelog);
+
+const pageTitle = 'Battles';
+const siteName = 'Stygmara Campaign';
+---
+
+<ContentLayout>
+  <div>
+    <h1>{pageTitle}</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia tenetur quidem excepturi quis accusantium vero voluptatum temporibus est animi fuga?</p>
+    <p>Battlelog:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Location</th>
+          <th>Attacker</th>
+          <th>Defender</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Result</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          battlelog.map(({ battleID, name, loc, attacker, defender, type, date, result, notes }) => (
+            <tr>
+              <td>{name}</td>
+              <td>{loc}</td>
+              <td>{attacker}</td>
+              <td>{defender}</td>
+              <td>{type}</td>
+              <td>{date}</td>
+              <td>{result}</td>
+              <td>{notes}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    <p>Force:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>forceID</th>
+          <th>name</th>
+          <th>metaFaction</th>
+          <th>leader</th>
+          <th>battletally</th>
+          <th>victories</th>
+          <th>defeats</th>
+          <th>kills</th>
+          <th>deaths</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          forces.map(({ forceID, name, metaFaction, leader, battletally, victories, defeats, kills, deaths }) => (
+            <tr>
+              <td>{forceID}</td>
+              <td>{name}</td>
+              <td>{metaFaction}</td>
+              <td>{leader}</td>
+              <td>{battletally}</td>
+              <td>{victories}</td>
+              <td>{defeats}</td>
+              <td>{kills}</td>
+              <td>{deaths}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</ContentLayout>

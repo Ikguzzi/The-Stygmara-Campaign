@@ -1,0 +1,44 @@
+---
+const { pageTitle } = Astro.props;
+const siteName = 'Stygmara Campaign';
+---
+
+<nav class="navContainer">
+  <div class="navName">
+    <strong>
+      <a href="/">{siteName}</a>
+    </strong>
+  </div>
+  <ul>
+    <li>
+      <b>
+        <a href="/">Home</a>
+      </b>
+    </li>
+    <li>
+      <b>
+        <a href="/lore/">Lore</a>
+      </b>
+    </li>
+    <li>
+      <b>
+        <a href="/factions/">Factions</a>
+      </b>
+    </li>
+    <li>
+      <b>
+        <a href="/battles/">Battles</a>
+      </b>
+    </li>
+    <li>
+      <b>
+        <a href="/forces/">Forces</a>
+      </b>
+    </li>
+    <li>
+      <b>
+        <a href="/rules/">Rules</a>
+      </b>
+    </li>
+  </ul>
+</nav>

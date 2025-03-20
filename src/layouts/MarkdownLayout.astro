@@ -1,0 +1,53 @@
+---
+import Layout from './Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Sidebar from '../components/Sidebar.astro';
+import ContentLayout from './contentLayout.astro';
+
+import { slugify } from '../scripts/utils';
+import { formatDate } from '../scripts/utils';
+
+const { frontmatter } = Astro.props;
+
+const { title, author, description, image, link, pubDate, tags } = frontmatter;
+---
+
+<style>
+  .postHeader {
+    text-align: center;
+  }
+  .postContent > article {
+    margin: 0 auto;
+    text-align: justify;
+    text-justify: inter-word;
+  }
+  hr {
+    width: 100%;
+  }
+  h1 {
+    font-size: 4rem;
+  }
+  summary {
+    font-size: 1.2rem;
+  }
+  .content {
+    font-weight: 200;
+  }
+</style>
+<ContentLayout pageTitle={title}>
+  <header>
+    <div class="postContainer">
+      <div class="postHeader">
+        <h1 class="h1">{title}</h1>
+        <div class="postDetail"><p>by <a href="">{author}</a> | {formatDate(pubDate)}</p></div>
+        <summary><i>{description}<i></i> </i> </summary>
+      </div>
+      <hr />
+      <div class="postContent">
+        <article class="content">
+          <slot />
+        </article>
+      </div>
+    </div>
+  </header>
+</ContentLayout>

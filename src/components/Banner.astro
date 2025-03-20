@@ -1,0 +1,13 @@
+---
+import '../scripts/Banner.js';
+const { pageTitle } = Astro.props;
+const { pageSubtitle } = Astro.props;
+---
+
+<div class="banner">
+  <div class="bannerGradient"></div>
+  <div class="bannerText">
+    <div class="subtitleText">{pageSubtitle}</div>
+    <div class="titleText"><strong>{pageTitle}</strong></div>
+  </div>
+</div>

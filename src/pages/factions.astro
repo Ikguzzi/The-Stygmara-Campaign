@@ -1,0 +1,20 @@
+---
+import ContentLayout from '../layouts/contentLayout.astro';
+import Navigation from '../components/Navigation.astro';
+import NavCard from '../components/NavCard.astro';
+
+const pageTitle = 'Factions';
+const siteName = 'Stygmara Campaign';
+---
+
+<ContentLayout>
+  <div>
+    <h1>{pageTitle}</h1>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia tenetur quidem excepturi quis accusantium vero voluptatum temporibus est animi fuga?</p>
+    <Navigation>
+      <NavCard cardTitle="Imperium of Man" cardLink="/lore/" cardImg="src/assets/Lore.jpg" cardImgAlt="" />
+      <NavCard cardTitle="Tyranids" cardLink="/factions/" cardImg="src/assets/Factions.png" cardImgAlt="" />
+      <NavCard cardTitle="Orks" cardLink="/forces/" cardImg="src/assets/Forces.png" cardImgAlt="" />
+    </Navigation>
+  </div>
+</ContentLayout>

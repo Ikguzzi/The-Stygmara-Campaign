@@ -1,0 +1,61 @@
+---
+import Navbar from '../components/Navbar.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Layout from './Layout.astro';
+
+import '../styles/global.css';
+
+const { siteName } = Astro.props;
+const { pageTitle } = Astro.props;
+const { pageSubtitle } = Astro.props;
+---
+
+<style>
+  /* Use Flexbox for better layout control */
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .mainContainer {
+    /* display: flex;
+    flex-grow: 1; */
+  }
+
+  aside {
+    width: 20%;
+    height: 100%;
+    background-color: #111;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: 20px;
+    box-shadow: 4px 4px 8px 4px rgba(0, 0, 0, 0.2);
+    border-right: 2px solid var(--darkgray);
+  }
+
+  main {
+    flex-grow: 1;
+    margin-left: 20%;
+    padding: 20px;
+    padding-top: 3.5rem; /* Pushes content below the fixed navbar */
+    box-sizing: border-box; /* Ensures padding doesn't add to the width */
+  }
+
+  .post {
+    width: 50%;
+    padding-top: 3.5rem; /* Pushes content below the fixed navbar */
+    margin: 0 auto;
+  }
+</style>
+
+<Layout siteName={siteName}>
+  <Navbar siteName={siteName} />
+  <div class="mainContainer">
+    <Sidebar />
+    <div class="post">
+      <slot />
+    </div>
+  </div>
+</Layout>

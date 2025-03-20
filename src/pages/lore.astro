@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Sidebar from '../components/Sidebar.astro';
+import ContentLayout from '../layouts/contentLayout.astro';
+
+const pageTitle = 'Lore';
+const siteName = 'Stygmara Campaign';
+---
+
+<style>
+  /* Use Flexbox for better layout control */
+  body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .mainContainer {
+    /* display: flex;
+    flex-grow: 1; */
+  }
+
+  main {
+    flex-grow: 1;
+    margin-left: 20%;
+    padding: 20px;
+    width: 90%;
+  }
+</style>
+<Layout siteName={siteName}>
+  <Navbar siteName={siteName} />
+  <div class="mainContainer">
+    <Sidebar />
+    <div class="post">
+      <div>
+        <h1>{pageTitle}</h1>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia tenetur quidem excepturi quis accusantium vero voluptatum temporibus est animi fuga?</p>
+        <p><a href="/posts/Forgotten_Resistance">Forgotten Resistance</a></p>
+        <p><a href="/posts/Untitled document">Galomar</a></p>
+        <p><a href="/src/content/lore/Forgotten_Resistance">Forgotten Resistance (content)</a></p>
+      </div>
+    </div>
+  </div>
+</Layout>

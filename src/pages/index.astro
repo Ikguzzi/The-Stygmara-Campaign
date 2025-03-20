@@ -1,11 +1,27 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import Banner from '../components/Banner.astro';
+import Navigation from '../components/Navigation.astro';
+import NavCard from '../components/NavCard.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const siteName = 'Stygmara Campaign';
+const pageSubtitle = 'The tales and battles from the';
+
+const tabName = 'Home';
 ---
 
-<Layout>
-	<Welcome />
+<Layout pageTitle={siteName}>
+  <Banner pageTitle={siteName} pageSubtitle={pageSubtitle} />
+  <Navigation>
+    <NavCard cardTitle="Lore" cardLink="/lore/" cardImg="src/assets/Lore.jpg" cardImgAlt="" />
+    <NavCard cardTitle="Campaign Log" cardLink="/battles/" cardImg="src/assets/Battles.png" cardImgAlt="" />
+    <NavCard cardTitle="Rules & Resources" cardLink="/factions/" cardImg="src/assets/Factions.png" cardImgAlt="" />
+  </Navigation>
+  <Navigation>
+    <NavCard cardTitle="Lore" cardLink="/lore/" cardImg="src/assets/Lore.jpg" cardImgAlt="" />
+    <NavCard cardTitle="Factions" cardLink="/factions/" cardImg="src/assets/Factions.png" cardImgAlt="" />
+    <NavCard cardTitle="Battles" cardLink="/battles/" cardImg="src/assets/Battles.png" cardImgAlt="" />
+    <NavCard cardTitle="Forces" cardLink="/forces/" cardImg="src/assets/Forces.png" cardImgAlt="" />
+    <NavCard cardTitle="Rules" cardLink="/rules/" cardImg="src/assets/Rules.png" cardImgAlt="" />
+  </Navigation>
 </Layout>
