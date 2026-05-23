@@ -1,0 +1,23 @@
+---
+import { db, Rosters, Units, Weapons, GameResults } from 'astro:db';
+
+const rosters = await db.select().from(Rosters);
+const units = await db.select().from(Units);
+const weapons = await db.select().from(Weapons);
+const gamestats = await db.select().from(GameResults);
+
+import rosterData from '../../json/[2000] Mech Guard V3_.json';
+const force = (rosterData as any).roster.forces[0];
+const topLevel = force.selections.map((s: any) => s.name);
+
+---
+{topLevel.map((name: string) => <p>{name}</p>)}
+
+<h2>Rosters ({rosters.length})</h2>
+{rosters.map(r => <p>{r.name} - {r.faction} - {r.pointsTotal}pts</p>)}
+
+<h2>Units ({units.length})</h2>
+{units.map(u => <p>{u.name} - {u.unitType} - {u.points}pts</p>)}
+
+<h2>Weapons ({weapons.length})</h2>
+{weapons.map(w => <p>{w.name} - {w.weaponType} - S{w.strength} AP{w.armorPen} D{w.damage}</p>)}

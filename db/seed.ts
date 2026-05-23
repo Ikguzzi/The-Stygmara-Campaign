@@ -1,19 +1,153 @@
-import { db, Battlelog, Factions, Forces, Phases } from 'astro:db';
+import { db, Rosters, Units, Weapons } from 'astro:db';
+import { readFileSync } from 'fs';
+import { randomUUID } from 'crypto';
+import rosterData from '../json/[2000] Mech Guard V3_.json';
 
-// https://astro.build/db/seed
+await db.delete(Weapons);
+await db.delete(Units);
+await db.delete(Rosters);
+
+// ---- helpers ----------------------------------------------------------------
+
+function getStat(characteristics: any[], name: string): string | undefined {
+    return characteristics?.find((c: any) => c.name === name)?.$text;
+}
+
+function getPoints(selection: any): number {
+    return selection?.costs?.find((c: any) => c.name === 'pts')?.value ?? 0;
+}
+
+// Recursively collect all selections that have profiles of typeName "Unit"
+function collectUnits(selections: any[]): any[] {
+    const units: any[] = [];
+    for (const sel of selections ?? []) {
+        const hasUnitProfile = sel.profiles?.some(
+            (p: any) => p.typeName === 'Unit'
+        );
+        if (hasUnitProfile) {
+            units.push(sel);
+        } else {
+            units.push(...collectUnits(sel.selections));
+        }
+    }
+    return units;
+}
+
+// Collect weapon profiles from a selection and all nested selections
+function collectWeapons(selection: any): any[] {
+    const weapons: any[] = [];
+
+    const directProfiles = selection.profiles ?? [];
+    for (const p of directProfiles) {
+        if (p.typeName === 'Ranged Weapons' || p.typeName === 'Melee Weapons') {
+            weapons.push(p);
+        }
+    }
+
+    for (const sub of selection.selections ?? []) {
+        weapons.push(...collectWeapons(sub));
+    }
+
+    return weapons;
+}
+
+// ---- main -------------------------------------------------------------------
+
 export default async function seed() {
-  await db.delete(Forces);
-  await db.delete(Battlelog);
+    // Update this path to point to your actual JSON file
+    //const filePath = "json/[2000] Mech Guard V3_.json";
+    //const raw = readFileSync(filePath, 'utf-8');
+    //const data = JSON.parse(raw);
+    const data = rosterData;
+    
+    const roster = data.roster;
+    const force = roster.forces?.[0];
 
-  await db.insert(Forces).values([
-    { forceID: 0, name: "262nd Galomar TESTERS 'Galomar TESTIES'", metaFaction: 'Astra Militarum', leader: 'Tester van der Heap', battletally: 11, victories: 1, defeats: 10, kills: 60, deaths: 35 },
-    { forceID: 1, name: 'Galomarian Streetfighters', metaFaction: 'Astra Militarum', leader: 'Mauger van der Heap', battletally: 15, victories: 8, defeats: 7, kills: 108, deaths: 152 },
-    { forceID: 2, name: 'Red Faction', metaFaction: 'Astra ', leader: 'Tester van der Heap', battletally: 11, victories: 1, defeats: 10, kills: 60, deaths: 35 },
-    { forceID: 3, name: 'Blue Faction', metaFaction: ' Militarum', leader: 'Tester van der Heap', battletally: 11, victories: 1, defeats: 10, kills: 60, deaths: 35 },
-  ]);
+    if (!force) {
+        console.error('No forces found in roster.');
+        return;
+    }
 
-  await db.insert(Battlelog).values([
-    { battleID: 0, name: 'Test', loc: 'test', battleATKID: 2, battleDEFID: 1, type: '', date: 2222, result: 'Win', notes: 'not' },
-    { battleID: 1, name: 'Battle of Jequira', loc: 'test', battleATKID: 1, battleDEFID: 2, type: 'Test', date: 2222, result: 'Win', notes: 'not' },
-  ]);
+    // --- Roster -----------------------------------------------------------------
+    const rosterId = randomUUID();
+
+    const detachmentSelection = force.selections?.find(
+        (s: any) => s.name === 'Detachment'
+    );
+    const detachmentName =
+        detachmentSelection?.selections?.[0]?.name ?? 'Unknown';
+
+    const battleSizeSelection = force.selections?.find(
+        (s: any) => s.name === 'Battle Size'
+    );
+    const battleSizeName =
+        battleSizeSelection?.selections?.[0]?.name ?? 'Unknown';
+
+    await db.insert(Rosters).values({
+        id:           rosterId,
+        name:         roster.name ?? 'Unnamed Roster',
+        faction:      force.catalogueName ?? 'Unknown',
+        detachment:   detachmentName,
+        battleSize:   battleSizeName,
+        pointsTotal:  roster.costs?.find((c: any) => c.name === 'pts')?.value ?? 0,
+        pointsLimit:  roster.costLimits?.find((c: any) => c.name === 'pts')?.value ?? 0,
+        gameSystem:   roster.gameSystemName ?? 'Unknown',
+        createdAt:    new Date(),
+    });
+
+    console.log(`✔ Inserted roster: ${roster.name}`);
+
+    // --- Units & Weapons --------------------------------------------------------
+    
+    const unitSelections = force.selections ?? [];
+
+    for (const sel of unitSelections) {
+        const unitId = randomUUID();
+
+        // Find the Unit profile for stats
+        const unitProfile = sel.profiles?.find((p: any) => p.typeName === 'Unit');
+        const chars = unitProfile?.characteristics ?? [];
+
+        // Determine primary category (Infantry, Vehicle, etc.)
+        const primaryCategory = sel.categories?.find((c: any) => c.primary)?.name ?? null;
+
+        await db.insert(Units).values({
+            id:               unitId,
+            rosterId:         rosterId,
+            name:             sel.name,
+            type:             sel.type ?? 'unit',
+            unitType:         primaryCategory,
+            points:           getPoints(sel),
+            number:           sel.number ?? 1,
+            move:             getStat(chars, 'M'),
+            toughness:        getStat(chars, 'T') ? parseInt(getStat(chars, 'T')!) : undefined,
+            save:             getStat(chars, 'SV'),
+            wounds:           getStat(chars, 'W') ? parseInt(getStat(chars, 'W')!) : undefined,
+            leadership:       getStat(chars, 'LD'),
+            objectiveControl: getStat(chars, 'OC') ? parseInt(getStat(chars, 'OC')!) : undefined,
+        });
+
+        // Collect and insert weapons
+        const weapons = collectWeapons(sel);
+        for (const wp of weapons) {
+            const wChars = wp.characteristics ?? [];
+            await db.insert(Weapons).values({
+                id:         randomUUID(),
+                unitId:     unitId,
+                name:       wp.name,
+                weaponType: wp.typeName === 'Ranged Weapons' ? 'Ranged' : 'Melee',
+                range:      getStat(wChars, 'Range'),
+                attacks:    getStat(wChars, 'A'),
+                skill:      getStat(wChars, 'BS') ?? getStat(wChars, 'WS'),
+                strength:   getStat(wChars, 'S') ? parseInt(getStat(wChars, 'S')!) : undefined,
+                armorPen:   getStat(wChars, 'AP') ? parseInt(getStat(wChars, 'AP')!) : undefined,
+                damage:     getStat(wChars, 'D'),
+                abilities:  getStat(wChars, 'Keywords'),
+            });
+        }
+
+        console.log(`✔ Inserted unit: ${sel.name} (${weapons.length} weapons)`);
+    }
+
+    console.log('\n✅ Seeding complete!');
 }

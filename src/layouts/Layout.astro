@@ -3,20 +3,20 @@ import Header from '../components/Header.astro';
 
 import '../styles/global.css';
 
-const { pageTitle } = Astro.props;
-const { pageSubtitle } = Astro.props;
+const {pageTitle} = Astro.props;
+const {pageSubtitle} = Astro.props;
 ---
 
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="generator" content={Astro.generator}/>
     <title>{pageTitle}</title>
-  </head>
-  <body>
-    <!-- <h1>{pageTitle}</h1> -->
-    <slot />
-  </body>
+</head>
+<body>
+<!-- <h1>{pageTitle}</h1> -->
+<slot/>
+</body>
 </html>
