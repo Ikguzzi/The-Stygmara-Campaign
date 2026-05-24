@@ -1,17 +1,108 @@
 ---
-import { db, Rosters, Units, Weapons, GameResults } from 'astro:db';
-
+import { db, Rosters, Units, Weapons, GameResults, UnitStats, Factions, Alignments } from 'astro:db';
+import rosterData from '../../json/[2000] Mech Guard V3_.json';
 const rosters = await db.select().from(Rosters);
 const units = await db.select().from(Units);
 const weapons = await db.select().from(Weapons);
 const gamestats = await db.select().from(GameResults);
+const unitStats = await db.select().from(UnitStats);
+const factions = await db.select().from(Factions);
+const alignments = await db.select().from(Alignments);
 
-import rosterData from '../../json/[2000] Mech Guard V3_.json';
+const rosterColumns = rosters.length > 0 ? Object.keys(rosters[0]) : [];
+const unitColumns = units.length > 0 ? Object.keys(units[0]) : [];
+const unitStatsColumns = unitStats.length > 0 ? Object.keys(unitStats[0]) : [];
+const weaponsColumns = weapons.length > 0 ? Object.keys(weapons[0]) : [];
+const factionsColumns = factions.length > 0 ? Object.keys(factions[0]) : [];
+const alignmentsColumns = alignments.length > 0 ? Object.keys(alignments[0]) : [];
+
 const force = (rosterData as any).roster.forces[0];
 const topLevel = force.selections.map((s: any) => s.name);
 
+// {topLevel.map((name: string) => <p>{name}</p>)}
 ---
-{topLevel.map((name: string) => <p>{name}</p>)}
+<style>
+    table, th, td {
+        border:1px solid black;
+    }
+    table {
+        margin: 0 auto;
+        width: 75%;
+    }
+</style>
+
+
+<h2 style="text-align: center">Units</h2>
+<table >
+    <tr>
+        {unitColumns.map(col => <th>{col}</th>)}
+    </tr>
+    {units.map(unit => (
+            <tr>
+                {Object.values(unit).map(val => <td>{val ?? '-'}</td>)}
+            </tr>
+    ))}
+</table>
+
+<h2 style="text-align: center">UnitStats</h2>
+<table >
+    <tr>
+        {unitStatsColumns.map(col => <th>{col}</th>)}
+    </tr>
+    {units.map(unit => (
+            <tr>
+                {Object.values(unitStats).map(val => <td>{val ?? '-'}</td>)}
+            </tr>
+    ))}
+</table>
+
+<h2 style="text-align: center">Rosters</h2>
+<table >
+    <tr>
+        {rosterColumns.map(col => <th>{col}</th>)}
+    </tr>
+    {rosters.map(rosters => (
+            <tr>
+                {Object.values(rosters).map(val => <td>{val ?? '-'}</td>)}
+            </tr>
+    ))}
+</table>
+
+<h2 style="text-align: center">Weapons</h2>
+<table >
+    <tr>
+        {weaponsColumns.map(col => <th>{col}</th>)}
+    </tr>
+    {weapons.map(weapons => (
+            <tr>
+                {Object.values(weapons).map(val => <td>{val ?? '-'}</td>)}
+            </tr>
+    ))}
+</table>
+
+<h2 style="text-align: center">Alignments</h2>
+<table >
+    <tr>
+        {alignmentsColumns.map(col => <th>{col}</th>)}
+    </tr>
+    {alignments.map(alignments => (
+            <tr>
+                {Object.values(alignments).map(val => <td>{val ?? '-'}</td>)}
+            </tr>
+    ))}
+</table>
+
+<h2 style="text-align: center">Factions</h2>
+<table >
+    <tr>
+        {factionsColumns.map(col => <th>{col}</th>)}
+    </tr>
+    {factions.map(factions => (
+            <tr>
+                {Object.values(factions).map(val => <td>{val ?? '-'}</td>)}
+            </tr>
+    ))}
+</table>
 
 <h2>Rosters ({rosters.length})</h2>
 {rosters.map(r => <p>{r.name} - {r.faction} - {r.pointsTotal}pts</p>)}

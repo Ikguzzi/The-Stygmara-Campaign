@@ -1,4 +1,4 @@
-import { db, Rosters, Units, Weapons } from 'astro:db';
+import { db, Rosters, Units, Weapons, Factions, Alignments } from 'astro:db';
 import { readFileSync } from 'fs';
 import { randomUUID } from 'crypto';
 import rosterData from '../json/[2000] Mech Guard V3_.json';
@@ -6,6 +6,8 @@ import rosterData from '../json/[2000] Mech Guard V3_.json';
 await db.delete(Weapons);
 await db.delete(Units);
 await db.delete(Rosters);
+await db.delete(Factions);
+await db.delete(Alignments);
 
 // ---- helpers ----------------------------------------------------------------
 
@@ -15,22 +17,6 @@ function getStat(characteristics: any[], name: string): string | undefined {
 
 function getPoints(selection: any): number {
     return selection?.costs?.find((c: any) => c.name === 'pts')?.value ?? 0;
-}
-
-// Recursively collect all selections that have profiles of typeName "Unit"
-function collectUnits(selections: any[]): any[] {
-    const units: any[] = [];
-    for (const sel of selections ?? []) {
-        const hasUnitProfile = sel.profiles?.some(
-            (p: any) => p.typeName === 'Unit'
-        );
-        if (hasUnitProfile) {
-            units.push(sel);
-        } else {
-            units.push(...collectUnits(sel.selections));
-        }
-    }
-    return units;
 }
 
 // Collect weapon profiles from a selection and all nested selections
@@ -59,7 +45,6 @@ export default async function seed() {
     //const raw = readFileSync(filePath, 'utf-8');
     //const data = JSON.parse(raw);
     const data = rosterData;
-    
     const roster = data.roster;
     const force = roster.forces?.[0];
 
@@ -115,6 +100,7 @@ export default async function seed() {
             id:               unitId,
             rosterId:         rosterId,
             name:             sel.name,
+            nickname:         sel.name,
             type:             sel.type ?? 'unit',
             unitType:         primaryCategory,
             points:           getPoints(sel),
@@ -149,5 +135,19 @@ export default async function seed() {
         console.log(`✔ Inserted unit: ${sel.name} (${weapons.length} weapons)`);
     }
 
+    // === Factions and Alignments ===
+
+    const alignmentId = randomUUID();
+    await db.insert(Alignments).values({
+        id:   alignmentId,
+        name: 'Imperium',
+    });
+
+    await db.insert(Factions).values({
+        id:               randomUUID(),
+        factionAlignment: alignmentId, // reuse the same id
+        name:             'Galomar testies',
+    });
+    
     console.log('\n✅ Seeding complete!');
 }

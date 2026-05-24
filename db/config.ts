@@ -30,20 +30,28 @@ const Players = defineTable({
         createdAt:          column.date({ default: NOW }),
     },
 });
-
-const Factions = defineTable({
+const Alignments = defineTable({
     columns: {
-        id:                 column.text({ primaryKey: true, autoIncrement: true }),
-
+        id:               column.text({ primaryKey: true }),
+        name:               column.text(),
     }
 })
-
+const Factions = defineTable({
+    columns: {
+        id:                 column.text({ primaryKey: true}),
+        factionAlignment:   column.text({references: () => Alignments.columns.id }),
+        name:               column.text(),
+        totalBattles:       column.number({default: 0}),
+        totalWins:          column.number({default: 0}),
+    }
+})
 // Each unit inside a roster (Infantry, Vehicle, Character, etc.)
 const Units = defineTable({
     columns: {
         id:                 column.text({ primaryKey: true }),
         rosterId:           column.text({ references: () => Rosters.columns.id }),
         name:               column.text(),        // e.g. "Cadian Castellan"
+        nickname:           column.text({ optional: true }),
         type:               column.text(),        // e.g. "unit", "upgrade"
         unitType:           column.text({ optional: true }), // e.g. "Infantry", "Vehicle", "Character"
         points:             column.number({ optional: true }),
@@ -57,7 +65,6 @@ const Units = defineTable({
         objectiveControl:   column.number({ optional: true }),
     },
 });
-
 // Weapons belonging to a unit
 const Weapons = defineTable({
     columns: {
@@ -74,7 +81,6 @@ const Weapons = defineTable({
         abilities:          column.text({ optional: true }), // comma-separated keywords
     },
 });
-
 // Game results — track wins/losses per roster
 const GameResults = defineTable({
     columns: {
@@ -89,7 +95,6 @@ const GameResults = defineTable({
         playedAt:       column.date({ default: NOW }),
     },
 });
-
 const GameUnitLog = defineTable({
     columns: {
         id:         column.text({ primaryKey: true }),
@@ -102,7 +107,6 @@ const GameUnitLog = defineTable({
         notes:      column.text({ optional: true }), // e.g. "got a battle scar this game"
     },
 })
-
 // ====== Flexible tables ======
 const UnitStats = defineTable({
     columns: {
@@ -135,7 +139,6 @@ const ForceStats = defineTable({
         lastUpdatedAt:      column.date(),
     }
 })
-
 const Phases = defineTable({
     columns: {
         phaseID: column.number(),
@@ -144,5 +147,15 @@ const Phases = defineTable({
 
 // https://astro.build/db/config
 export default defineDb({
-    tables: {Rosters,Players, Units, Weapons, GameResults, Phases},
+    tables: {
+        Rosters,
+        Players, 
+        Units, 
+        Weapons, 
+        GameResults, 
+        UnitStats, 
+        Phases, 
+        Factions,
+        Alignments
+    },
 });
