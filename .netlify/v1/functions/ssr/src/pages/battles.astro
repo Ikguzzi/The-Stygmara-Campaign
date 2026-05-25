@@ -1,0 +1,32 @@
+---
+import {db, GameResults, GameUnitLog} from 'astro:db';
+import ContentLayout from '../layouts/contentLayout.astro';
+import DataTable from '../components/Table.astro';
+import InsertForm from '../components/InsertForm.astro';
+
+const forces = await db.select().from(GameResults);
+const gameResults = await db.select().from(GameResults);
+
+const pageTitle = 'Battles';
+const siteName = 'Stygmara Campaign';
+
+if (Astro.request.method === 'POST') {
+    const formData = await Astro.request.formData();
+    const author = formData.get('author');
+    const body = formData.get('body');
+}
+---
+
+<ContentLayout>
+    <InsertForm
+            data={gameResults}
+            title="Battle Log"
+            columns={['missionName', 'attackerId','defenderId', 'playedAt']}
+            fancyColumns={['Battle name', 'Attacker', 'Defender', 'Played']}/>
+    
+    <DataTable 
+            data={gameResults}
+            title="Battle Log"
+            columns={['name', 'faction', 'detachment', 'battleSize', 'createdAt']}
+            fancyColumns={['Roster Name', 'Faction', 'Detatchment', 'Size', 'Created']}/>
+</ContentLayout>
