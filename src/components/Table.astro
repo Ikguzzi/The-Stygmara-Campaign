@@ -1,0 +1,36 @@
+---
+interface Props {
+    data: Record<string, any>[];
+    title?: string;
+    columns?: string[];
+    fancyColumns?: string[];
+}
+
+const { data, title, columns: selectedColumns, fancyColumns } = Astro.props;
+const columns = selectedColumns ?? (data.length > 0 ? Object.keys(data[0]) : []);
+const headers = fancyColumns ?? columns;
+
+---
+
+{title && <h2>{title}</h2>}
+
+{data.length === 0 ? (
+<p>No data found.</p>
+    ) : (
+<table>
+    <thead>
+    <tr>
+        {headers.map(header => <th>{header}</th>)}
+    </tr>
+    </thead>
+    <tbody>
+    {data.map(row => (
+            <tr>
+                {columns.map(col => (
+                        <td>{row[col] ?? '-'}</td>
+                ))}
+            </tr>
+    ))}
+    </tbody>
+</table>
+    )}

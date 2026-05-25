@@ -1,0 +1,9 @@
+---
+import { db, GameResults } from 'astro:db';
+import { eq } from 'astro:db';
+
+const { id } = Astro.params;
+const battle = await db.select().from(GameResults).where(eq(GameResults.id, id));
+---
+
+<h1>Battle: {battle[0]?.mission}</h1>

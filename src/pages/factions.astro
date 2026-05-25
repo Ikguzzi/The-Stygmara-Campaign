@@ -1,7 +1,11 @@
 ---
+import { db, Units, Rosters } from 'astro:db';
 import ContentLayout from '../layouts/contentLayout.astro';
 import Navigation from '../components/Navigation.astro';
 import NavCard from '../components/NavCard.astro';
+import DataTable from '../components/Table.astro';
+
+const rosters = await db.select().from(Rosters);
 
 const pageTitle = 'Factions';
 const siteName = 'Stygmara Campaign';
@@ -18,4 +22,12 @@ const siteName = 'Stygmara Campaign';
             <NavCard cardTitle="Orks" cardLink="/forces/" cardImg="src/assets/Forces.png" cardImgAlt=""/>
         </Navigation>
     </div>
+<div>
+    <DataTable
+            data={rosters}
+            title="Rosters"
+            columns={['name', 'faction', 'detachment', 'battleSize', 'createdAt']}
+            fancyColumns={['Roster Name', 'Faction', 'Detatchment', 'Size', 'Created']}
+    />
+</div>
 </ContentLayout>

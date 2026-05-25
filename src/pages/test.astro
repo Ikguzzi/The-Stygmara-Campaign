@@ -1,5 +1,5 @@
 ---
-import { db, Rosters, Units, Weapons, GameResults, UnitStats, Factions, Alignments } from 'astro:db';
+import { db,Players, Rosters, Units, Weapons, GameResults, UnitStats, Factions, Alignments } from 'astro:db';
 import rosterData from '../../json/[2000] Mech Guard V3_.json';
 const rosters = await db.select().from(Rosters);
 const units = await db.select().from(Units);
@@ -19,6 +19,17 @@ const alignmentsColumns = alignments.length > 0 ? Object.keys(alignments[0]) : [
 const force = (rosterData as any).roster.forces[0];
 const topLevel = force.selections.map((s: any) => s.name);
 
+if (Astro.request.method === 'POST') {
+    // Parse form data
+    const formData = await Astro.request.formData();
+    const playerName = formData.get('player');
+    const playerWins = formData.get('wins');
+    if (typeof playerName === 'string' && typeof playerWins === 'string') {
+        // Insert form data into the Comment table
+        await db.insert(Players).values({ name: playerName, totalWins: playerWins });
+    }
+}
+
 // {topLevel.map((name: string) => <p>{name}</p>)}
 ---
 <style>
@@ -31,6 +42,15 @@ const topLevel = force.selections.map((s: any) => s.name);
     }
 </style>
 
+<form method="POST" style="display: grid">
+    <label for="player">Name</label>
+    <input id="player" name="player" />
+
+    <label for="wins">Wins</label>
+    <input type="number" id="wins" name="wins" />
+
+    <button type="submit">Submit</button>
+</form>
 
 <h2 style="text-align: center">Units</h2>
 <table >

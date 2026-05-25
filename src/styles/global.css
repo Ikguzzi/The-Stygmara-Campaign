@@ -241,4 +241,9 @@ th {
     color: var(--white);
 }
 
-/*--- Armies Page ---*/
+/*--- Forms ---*/
+
+ input, button
+ {
+     color: var(--black);
+ }

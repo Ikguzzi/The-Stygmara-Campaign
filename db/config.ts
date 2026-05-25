@@ -45,6 +45,31 @@ const Factions = defineTable({
         totalWins:          column.number({default: 0}),
     }
 })
+const Sectors = defineTable({
+    columns: {
+        id:                 column.text({ primaryKey: true }),
+        name:                column.text(),
+        warState:            column.text({default: "Passive"}),
+        ownedBy:            column.text({references: () => Alignments.columns.id }),
+    }
+})
+const Planets = defineTable({
+    columns: {
+        id:               column.text({ primaryKey: true }),
+        sectorID:            column.text({ references: () => Sectors.columns.id }),
+        name:                column.text(),
+        environment:        column.text({optional: true}),
+        ownedBy:            column.text({references: () => Alignments.columns.id}),
+        warState:            column.text({default: "Passive"}),
+    }
+})
+const Locations = defineTable({
+    columns: {
+        id:               column.text({ primaryKey: true }),
+        planetID:            column.text({ references: () => Planets.columns.id }),
+        locationType:       column.text(),
+    }
+})
 // Each unit inside a roster (Infantry, Vehicle, Character, etc.)
 const Units = defineTable({
     columns: {
@@ -85,12 +110,14 @@ const Weapons = defineTable({
 const GameResults = defineTable({
     columns: {
         id:             column.text({ primaryKey: true }),
-        rosterId:       column.text({ references: () => Rosters.columns.id }),
-        opponentId:     column.text({ references: () => Rosters.columns.id, optional: true }), // optional if opponent isn't in the campaign
+        attackerId:       column.text({ references: () => Rosters.columns.id }),
+        defenderId:     column.text({ references: () => Rosters.columns.id, optional: true }), // optional if opponent isn't in the campaign
+        missionName:    column.text({ default: "Undisclosed"}),
         mission:        column.text({ optional: true }),
+        location:       column.text({ optional: true }),
         result:         column.text(),                   // "win", "loss", "draw"
-        score:          column.number({ default: 0 }),
-        opponentScore:  column.number({ default: 0 }),
+        attackerScore:          column.number({ default: 0 }),
+        defenderScore:  column.number({ default: 0 }),
         notes:          column.text({ optional: true }), // battle report / narrative
         playedAt:       column.date({ default: NOW }),
     },
@@ -152,7 +179,8 @@ export default defineDb({
         Players, 
         Units, 
         Weapons, 
-        GameResults, 
+        GameResults,
+        GameUnitLog,
         UnitStats, 
         Phases, 
         Factions,

@@ -1,0 +1,23 @@
+---
+interface Props {
+    data?: Record<string, any>[];
+    title?: string;
+    columns?: string[];
+    fancyColumns?: string[];
+}
+
+const { data, title, columns: selectedColumns, fancyColumns } = Astro.props;
+const columns = selectedColumns ?? (data && data.length > 0 ? Object.keys(data[0]) : []);
+const headers = fancyColumns ?? columns;
+
+---
+
+<form method="POST" style="display: grid">
+    {columns.map(col => (
+            <>
+                <label for={col}>{fancyColumns?.[columns.indexOf(col)] ?? col}</label>
+                <input id={col} name={col} />
+            </>
+    ))}
+    <button type="submit">Submit</button>
+</form>
