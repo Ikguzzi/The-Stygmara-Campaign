@@ -3,7 +3,7 @@ import netlify from '@astrojs/netlify';
 import db from '@astrojs/db';
 
 export default defineConfig({
-    output: 'server',
+    output: 'static',
     adapter: netlify(),
     integrations: [db()],
 });
